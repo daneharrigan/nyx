@@ -2,28 +2,32 @@ package middleware
 
 import (
 	"net/http"
-	"code.google.com/p/go-uuid/uuid"
+	"github.com/daneharrigan/nyx/context"
 )
 
 type Middleware interface {
-	http.Handler
-	Build(http.Handler) http.Handler
+	context.Acceptor
+	Build(context.Acceptor) context.Acceptor
 }
 
 type RequestIDHandler struct {
-	Handler http.Handler
+	Acceptor context.Acceptor
 }
 
-func (h *RequestIDHandler) Build(handler http.Handler) http.Handler {
-	h.Handler = handler
+func (h *RequestIDHandler) Build(acceptor context.Acceptor) context.Acceptor {
+	h.Acceptor = acceptor
 	return h
 }
 
-func (h *RequestIDHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Header.Get("Request-Id") == "" {
-		r.Header.Set("Request-Id", uuid.New())
+func (h *RequestIDHandler) Accept(c *context.Context) {
+	requestID := c.Request.Header.Get("Request-Id")
+	if requestID != "" {
+		c.RequestID = requestID
+	} else {
+		c.RequestID = c.InternalID
+		c.Request.Header.Set("Request-Id", c.RequestID)
 	}
 
-	w.Header().Set("Request-Id", r.Header.Get("Request-Id"))
-	h.Handler.ServeHTTP(w, r)
+	c.ResponseWriter.Header().Set("Request-Id", c.RequestID)
+	c.Acceptor.Accept(c)
 }
