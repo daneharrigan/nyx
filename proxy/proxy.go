@@ -2,14 +2,16 @@ package proxy
 
 import (
 	"net/http"
+	"net/http/httputil"
 
 	"github.com/daneharrigan/nyx/nameserver"
 	"github.com/daneharrigan/nyx/middleware"
 	"github.com/daneharrigan/nyx/logger"
+	"github.com/daneharrigan/nyx/context"
 )
 
 type Proxy interface {
-	http.Handler
+	context.Acceptor
 	SetLogger(logger.Logger)
 	SetNameserver(nameserver.Nameserver)
 	Use(middleware.Middleware)
@@ -23,6 +25,7 @@ type proxy struct {
 	logger logger.Logger
 	ns nameserver.Nameserver
 	middleware []middleware.Middleware
+	reverseProxy *httputil.ReverseProxy
 }
 
 func (p *proxy) SetLogger(l logger.Logger) {
@@ -35,6 +38,15 @@ func (p *proxy) SetNameserver(ns nameserver.Nameserver) {
 
 func (p *proxy) Use(m middleware.Middleware) {
 	p.middleware = append(p.middleware, m)
+}
+
+func (p *proxy) Accept(c *context.Context) {
+	var acceptor context.acceptor = p.reverseProxy
+	for _, m := range p.middleware {
+		acceptor = m.Build(acceptor)
+	}
+
+	acceptor.Accept(c)
 }
 
 func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
