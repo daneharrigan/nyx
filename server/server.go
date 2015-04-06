@@ -47,7 +47,7 @@ func (s *server) Listen() error {
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	c := context.New(w, r)
 
-	var acceptor context.acceptor = s.proxy
+	var acceptor context.Acceptor = s.proxy
 	for _, m := range s.middleware {
 		acceptor = m.Build(acceptor)
 	}

@@ -37,7 +37,7 @@ func (p *proxy) Use(m middleware.Middleware) {
 }
 
 func (p *proxy) Accept(c *context.Context) {
-	var acceptor context.acceptor = NewHandler(p)
+	var acceptor context.Acceptor = NewHandler(p)
 	for _, m := range p.middleware {
 		acceptor = m.Build(acceptor)
 	}

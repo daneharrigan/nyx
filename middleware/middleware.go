@@ -26,5 +26,5 @@ func (h *RequestIDHandler) Accept(c *context.Context) {
 	}
 
 	c.ResponseWriter.Header().Set("Request-Id", c.RequestID)
-	c.Acceptor.Accept(c)
+	h.Acceptor.Accept(c)
 }
