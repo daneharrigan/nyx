@@ -25,7 +25,6 @@ type proxy struct {
 	logger logger.Logger
 	ns nameserver.Nameserver
 	middleware []middleware.Middleware
-	reverseProxy *httputil.ReverseProxy
 }
 
 func (p *proxy) SetLogger(l logger.Logger) {
@@ -41,20 +40,10 @@ func (p *proxy) Use(m middleware.Middleware) {
 }
 
 func (p *proxy) Accept(c *context.Context) {
-	var acceptor context.acceptor = p.reverseProxy
+	var acceptor context.acceptor = NewHandler(p)
 	for _, m := range p.middleware {
 		acceptor = m.Build(acceptor)
 	}
 
 	acceptor.Accept(c)
-}
-
-func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var handler http.Handler = p.reverseProxy
-	for _, m := range p.middleware {
-		handler = m.Build(handler)
-	}
-
-	p.logger.Printf("at=proxy fn=ServeHTTP request_id=%s",
-		r.Header.Get("Request-Id"))
 }
