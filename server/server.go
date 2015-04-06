@@ -6,6 +6,7 @@ import (
 	"github.com/daneharrigan/nyx/middleware"
 	"github.com/daneharrigan/nyx/proxy"
 	"github.com/daneharrigan/nyx/logger"
+	"github.com/daneharrigan/nyx/context"
 )
 
 type Server interface {
@@ -39,11 +40,17 @@ func (s *server) Use(m middleware.Middleware) {
 }
 
 func (s *server) Listen() error {
-	var handler http.Handler = s.proxy
+	srv := &http.Server{Addr: ":8080", Handler: s}
+	return srv.ListenAndServe()
+}
+
+func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	c := context.New(w, r)
+
+	var acceptor context.acceptor = s.proxy
 	for _, m := range s.middleware {
-		handler = m.Build(handler)
+		acceptor = m.Build(acceptor)
 	}
 
-	s.http = &http.Server{Addr: ":8080", Handler: handler}
-	return s.http.ListenAndServe()
+	acceptor.Accept(c)
 }
