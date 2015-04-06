@@ -3,10 +3,10 @@ package server
 import (
 	"net/http"
 
+	"github.com/daneharrigan/nyx/context"
+	"github.com/daneharrigan/nyx/logger"
 	"github.com/daneharrigan/nyx/middleware"
 	"github.com/daneharrigan/nyx/proxy"
-	"github.com/daneharrigan/nyx/logger"
-	"github.com/daneharrigan/nyx/context"
 )
 
 type Server interface {
@@ -21,10 +21,10 @@ func New() Server {
 }
 
 type server struct {
-	proxy proxy.Proxy
-	logger logger.Logger
+	proxy      proxy.Proxy
+	logger     logger.Logger
 	middleware []middleware.Middleware
-	http *http.Server
+	http       *http.Server
 }
 
 func (s *server) SetLogger(l logger.Logger) {

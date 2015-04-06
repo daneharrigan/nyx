@@ -7,4 +7,4 @@ func New() Nameserver {
 	return new(nameserver)
 }
 
-type nameserver struct {}
+type nameserver struct{}

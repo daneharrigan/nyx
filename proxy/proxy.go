@@ -1,13 +1,10 @@
 package proxy
 
 import (
-	"net/http"
-	"net/http/httputil"
-
-	"github.com/daneharrigan/nyx/nameserver"
-	"github.com/daneharrigan/nyx/middleware"
-	"github.com/daneharrigan/nyx/logger"
 	"github.com/daneharrigan/nyx/context"
+	"github.com/daneharrigan/nyx/logger"
+	"github.com/daneharrigan/nyx/middleware"
+	"github.com/daneharrigan/nyx/nameserver"
 )
 
 type Proxy interface {
@@ -22,8 +19,8 @@ func New() Proxy {
 }
 
 type proxy struct {
-	logger logger.Logger
-	ns nameserver.Nameserver
+	logger     logger.Logger
+	ns         nameserver.Nameserver
 	middleware []middleware.Middleware
 }
 

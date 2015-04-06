@@ -3,11 +3,11 @@ package main
 import (
 	"os"
 
-	"github.com/daneharrigan/nyx/server"
-	"github.com/daneharrigan/nyx/middleware"
-	"github.com/daneharrigan/nyx/proxy"
-	"github.com/daneharrigan/nyx/nameserver"
 	"github.com/daneharrigan/nyx/logger"
+	"github.com/daneharrigan/nyx/middleware"
+	"github.com/daneharrigan/nyx/nameserver"
+	"github.com/daneharrigan/nyx/proxy"
+	"github.com/daneharrigan/nyx/server"
 )
 
 var log = logger.New(os.Stderr, "ns=nyx")

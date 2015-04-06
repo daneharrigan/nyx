@@ -12,9 +12,9 @@ import (
 const Timeout = 3 * time.Millisecond
 
 type Handler struct {
-	proxy Proxy
+	proxy        Proxy
 	reverseProxy *httputil.ReverseProxy
-	context *context.Context
+	context      *context.Context
 	context.Acceptor
 }
 
@@ -22,7 +22,7 @@ func NewHandler(p Proxy) *Handler {
 	handler := &Handler{proxy: p}
 	handler.reverseProxy = &httputil.ReverseProxy{
 		Transport: &http.Transport{
-			Dial: handler.Dial
+			Dial: handler.Dial,
 		},
 		Director: handler.Director,
 	}

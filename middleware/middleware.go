@@ -1,9 +1,6 @@
 package middleware
 
-import (
-	"net/http"
-	"github.com/daneharrigan/nyx/context"
-)
+import "github.com/daneharrigan/nyx/context"
 
 type Middleware interface {
 	context.Acceptor
