@@ -13,6 +13,7 @@ type Server interface {
 	SetLogger(logger.Logger)
 	SetProxy(proxy.Proxy)
 	Use(middleware.Middleware)
+	Logger() logger.Logger
 	Listen() error
 }
 
@@ -42,6 +43,10 @@ func (s *server) Use(m middleware.Middleware) {
 func (s *server) Listen() error {
 	srv := &http.Server{Addr: ":8080", Handler: s}
 	return srv.ListenAndServe()
+}
+
+func (s *server) Logger() logger.Logger {
+	return s.logger
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
