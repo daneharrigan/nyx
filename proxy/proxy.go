@@ -11,6 +11,8 @@ type Proxy interface {
 	context.Acceptor
 	SetLogger(logger.Logger)
 	SetNameserver(nameserver.Nameserver)
+	Logger() logger.Logger
+	Nameserver() nameserver.Nameserver
 	Use(middleware.Middleware)
 }
 
@@ -20,7 +22,7 @@ func New() Proxy {
 
 type proxy struct {
 	logger     logger.Logger
-	ns         nameserver.Nameserver
+	nameserver nameserver.Nameserver
 	middleware []middleware.Middleware
 }
 
@@ -29,15 +31,23 @@ func (p *proxy) SetLogger(l logger.Logger) {
 }
 
 func (p *proxy) SetNameserver(ns nameserver.Nameserver) {
-	p.ns = ns
+	p.nameserver = ns
 }
 
 func (p *proxy) Use(m middleware.Middleware) {
 	p.middleware = append(p.middleware, m)
 }
 
+func (p *proxy) Logger() logger.Logger {
+	return p.logger
+}
+
+func (p *proxy) Nameserver() nameserver.Nameserver {
+	return p.nameserver
+}
+
 func (p *proxy) Accept(c *context.Context) {
-	var acceptor context.Acceptor = NewHandler(p)
+	var acceptor context.Acceptor = NewTransporter(p)
 	for _, m := range p.middleware {
 		acceptor = m.Build(acceptor)
 	}
