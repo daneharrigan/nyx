@@ -1,10 +1,11 @@
 package proxy
 
 import (
-	"github.com/daneharrigan/nyx/context"
-	"github.com/daneharrigan/nyx/nameserver"
 	"net/http"
 	"net/http/httputil"
+
+	"github.com/daneharrigan/nyx/context"
+	"github.com/daneharrigan/nyx/nameserver"
 )
 
 type Transporter interface {
