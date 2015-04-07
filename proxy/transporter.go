@@ -1,10 +1,10 @@
 package proxy
 
 import (
-	"net/http"
-	"net/http/httputil"
 	"github.com/daneharrigan/nyx/context"
 	"github.com/daneharrigan/nyx/nameserver"
+	"net/http"
+	"net/http/httputil"
 )
 
 type Transporter interface {
@@ -14,7 +14,7 @@ type Transporter interface {
 func NewTransporter(p Proxy) Transporter {
 	t := &transporter{proxy: p}
 	t.reverseProxy = &httputil.ReverseProxy{
-		Director: t.Director,
+		Director:  t.Director,
 		Transport: t,
 	}
 
@@ -22,10 +22,10 @@ func NewTransporter(p Proxy) Transporter {
 }
 
 type transporter struct {
-	proxy Proxy
+	proxy        Proxy
 	reverseProxy *httputil.ReverseProxy
-	context *context.Context
-	err error
+	context      *context.Context
+	err          error
 }
 
 func (t *transporter) Accept(c *context.Context) {
