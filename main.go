@@ -16,6 +16,11 @@ func main() {
 	log.Println("at=start")
 
 	ns := nameserver.New()
+	ns.Add("dane", &nameserver.Node{
+		Host:     "daneharrigan.com",
+		Port:     80,
+		Protocol: nameserver.HTTP,
+	})
 
 	p := proxy.New()
 	p.SetLogger(log)
