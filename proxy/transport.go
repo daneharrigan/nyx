@@ -1,40 +1,42 @@
 package proxy
 
 import (
+	"net"
 	"net/http"
 	"net/http/httputil"
+	"time"
 
 	"github.com/daneharrigan/nyx/context"
 	"github.com/daneharrigan/nyx/nameserver"
 )
 
-type Transporter interface {
-	context.Acceptor
-}
+const Timeout = 100 * time.Millisecond
 
-func NewTransporter(p Proxy) Transporter {
-	t := &transporter{proxy: p}
+func NewTransport(p Proxy) context.Acceptor {
+	t := &transport{proxy: p}
 	t.reverseProxy = &httputil.ReverseProxy{
-		Director:  t.Director,
-		Transport: t,
+		Director: t.Director,
+		Transport: &http.Transport{
+			Dial: t.Dial,
+		},
 	}
 
 	return t
 }
 
-type transporter struct {
+type transport struct {
 	proxy        Proxy
 	reverseProxy *httputil.ReverseProxy
 	context      *context.Context
 	err          error
 }
 
-func (t *transporter) Accept(c *context.Context) {
+func (t *transport) Accept(c *context.Context) {
 	t.context = c
 	t.reverseProxy.ServeHTTP(c.ResponseWriter, c.Request)
 }
 
-func (t *transporter) Director(r *http.Request) {
+func (t *transport) Director(r *http.Request) {
 	record, err := t.proxy.Nameserver().Lookup(r.Host)
 	if err != nil {
 		t.err = err
@@ -49,14 +51,10 @@ func (t *transporter) Director(r *http.Request) {
 	case nameserver.HTTP:
 		r.URL.Scheme = "http"
 	case nameserver.HTTPS:
-		r.URL.Scheme = "HTTPS"
+		r.URL.Scheme = "https"
 	}
 }
 
-func (t *transporter) RoundTrip(r *http.Request) (*http.Response, error) {
-	if t.err != nil {
-		return nil, t.err
-	}
-
-	return nil, nil
+func (t *transport) Dial(network, address string) (net.Conn, error) {
+	return net.DialTimeout(network, address, Timeout)
 }

@@ -47,7 +47,7 @@ func (p *proxy) Nameserver() nameserver.Nameserver {
 }
 
 func (p *proxy) Accept(c *context.Context) {
-	var acceptor context.Acceptor = NewTransporter(p)
+	var acceptor context.Acceptor = NewTransport(p)
 	for _, m := range p.middleware {
 		acceptor = m.Build(acceptor)
 	}
